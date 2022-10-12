@@ -31,29 +31,33 @@ class Conexion {
     }
 
     // devuelve un array con los tableros [0]oculto y [1]mostrar
-    public function getTablero($usr, $nPartida) {
+    public function getTablero($clave) { // clave de partida //puedo crear el campo partida actual en la bd en la tabla usuario
         $this->abrirConexion();
 
         $tableros = [];
 
-        $query = 'SELECT x, y, contenidoOculto, contenidoMostrado FROM'.
-            Constantes::$tablaTableros.'WHERE nickname LIKE ? and nPartida LIKE ?';
+        $query = 'SELECT pos, contenidoOculto, contenidoMostrado FROM'.
+            Constantes::$tablaTableros.'WHERE clave LIKE ?';
 
         $stmt = $this->conexion->prepare($query);
-        $stmt->bind_param('ss', $usr, $nPartida);
+        $stmt->bind_param('s', $clave);
         $resultados = $stmt->get_result();
 
         $tableroMostrar = []; $tableroOculto = [];
         if ($resultados->num_rows > 0) {
             while($fila = $resultados->fetch_array()) {
-                $x = $fila['x']; $y = $fila['y'];
-                $tableroMostrar[$x][$y] = $fila['contenidoMostrado'];
-                $tableroOculto[$x][$y] = $fila['contenidoOculto'];
+                $pos = $fila['pos'];
+                $tableroMostrar[$pos] = $fila['contenidoMostrado'];
+                $tableroOculto[$pos] = $fila['contenidoOculto'];
             }
         }
 
         $tableros[] = $tableroOculto; $tableros[] = $tableroMostrar;
 
         return $tableros;
+    }
+
+    public function insertTablero ($tableros) {
+
     }
 }
