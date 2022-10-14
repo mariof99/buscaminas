@@ -7,4 +7,5 @@ class Constantes {
     public static $db = 'buscaminas';
     public static $tablaTableros = 'tablero';
     public static $tablaUsuarios = 'usuarios';
+    public static $tablaUsuTab = 'usuarioTablero';
 }

@@ -1,9 +1,11 @@
 <?php
 
 class Tablero { // tabOculto (> 1 ==> nº minas cerca / 0 ==> nada / -1 ==> mina)
+    private $clave;
     private $tableros;
+    private $estado; // 0-> en curso / 1-> ganada / 2-> perdida
 
-    public static function generarTablero($tamano, $minas) { // PREGUNTAR A FERNANDO!!!
+    public static function generarTablero($tamano, $minas) {
         $tabOc = array_fill(0,$tamano, 0);
         $tabM = array_fill(0, $tamano, false);
         $posicionesOcupadas = [];
@@ -20,7 +22,7 @@ class Tablero { // tabOculto (> 1 ==> nº minas cerca / 0 ==> nada / -1 ==> mina
         }
 
         self::calcularMinasCerca($tabOc);
-        return new Tablero($tabOc, $tabM);
+        return new Tablero($tabOc, $tabM, 0);
     }
 
     private static function calcularMinasCerca(&$tab) {
@@ -44,20 +46,50 @@ class Tablero { // tabOculto (> 1 ==> nº minas cerca / 0 ==> nada / -1 ==> mina
         }
     }
 
-    function __construct(&$tabOculto, &$tableroMostrar) {
+    function __construct(&$tabOculto, &$tableroMostrar, $estado) {
         $this->tableros = []; // [0]-> tableroOculto [1]->tableroMostrar
         $this->tableros[] = $tabOculto; $this->tableros[] = $tableroMostrar;
+        $this->estado = $estado;
+        $this->clave = getdate()[0]; // no es aplicable a un caso real
     }    
     
 
     private function marcarCasilla($pos) {
+        $agua = true;
+
         if ($this->tableros[0][$pos] >= 0) {
-            $this->tableros[1][$pos] = true;
+            $this->tableros[1][$pos] = 1;
         }
         elseif ($this->tabOculto[$pos] == -1) {
-            $this->tableros[1] = array_fill_keys(array_keys($this->tableros[1]), true);
-        }
-        
+            $this->tableros[1] = array_fill_keys(array_keys($this->tableros[1]), 1);
+            $this->estado = 2;
+            $agua = false;
+        }        
+
+        return $agua;
+    }
+
+
+    public function getEstado() {
+        return $this->estado;
+    }
+
+    public function setEstado($estado) {
+        $this->estado = $estado;
+        return $this;
+    }
+
+
+    public function getTableros() {
         return $this->tableros;
+    }
+
+    public function getTableroOculto() {
+        return $this->tableros[0];
+    }
+
+
+    public function getClave() {
+        return $this->clave;
     }
 }
